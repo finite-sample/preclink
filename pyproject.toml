@@ -71,6 +71,7 @@ packages = ["tether"]
 line-length = 100
 target-version = "py312"
 src = ["tether"]
+exclude = ["tether/_version.py"]
 
 [tool.ruff.lint]
 select = [
