@@ -1,5 +1,5 @@
 preclink
-======
+========
 
 High-precision record linkage library implementing a 7-step pipeline with multi-pass support.
 
