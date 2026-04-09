@@ -93,3 +93,4 @@ Thumbs.db
 
 # uv
 uv.lock
+preclink/_version.py

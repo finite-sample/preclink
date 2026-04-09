@@ -1,6 +1,7 @@
 # preclink
 
 [![PyPI version](https://badge.fury.io/py/preclink.svg)](https://badge.fury.io/py/preclink)
+[![Downloads](https://pepy.tech/badge/preclink)](https://pepy.tech/project/preclink)
 [![CI](https://github.com/finite-sample/preclink/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/preclink/actions/workflows/ci.yml)
 [![Documentation](https://readthedocs.org/projects/preclink/badge/?version=latest)](https://preclink.readthedocs.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
