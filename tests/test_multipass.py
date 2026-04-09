@@ -1,9 +1,9 @@
 """Tests for multi-pass linkage."""
 
 import pandas as pd
-from tether import StringComparison
-from tether.multipass.orchestrator import MultiPassOrchestrator
-from tether.multipass.strategies import PassConfig, precision_first, strict_then_relaxed
+from suture import StringComparison
+from suture.multipass.orchestrator import MultiPassOrchestrator
+from suture.multipass.strategies import PassConfig, precision_first, strict_then_relaxed
 
 
 class TestMultiPassOrchestrator:

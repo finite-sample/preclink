@@ -1,4 +1,4 @@
-"""Pytest fixtures for tether tests."""
+"""Pytest fixtures for suture tests."""
 
 import pandas as pd
 import pytest

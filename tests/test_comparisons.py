@@ -2,7 +2,7 @@
 
 import pandas as pd
 import pytest
-from tether.score.comparisons import (
+from suture.score.comparisons import (
     DateComparison,
     ExactComparison,
     NumericComparison,

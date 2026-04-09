@@ -7,7 +7,7 @@ API Reference
 Core
 ----
 
-.. automodule:: tether.core
+.. automodule:: suture.core
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,12 +15,12 @@ Core
 Pipeline
 ~~~~~~~~
 
-.. autoclass:: tether.core.pipeline.PipelineBuilder
+.. autoclass:: suture.core.pipeline.PipelineBuilder
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: tether.core.pipeline.Pipeline
+.. autoclass:: suture.core.pipeline.Pipeline
    :members:
    :undoc-members:
    :show-inheritance:
@@ -28,7 +28,7 @@ Pipeline
 Result
 ~~~~~~
 
-.. autoclass:: tether.core.result.LinkageResult
+.. autoclass:: suture.core.result.LinkageResult
    :members:
    :undoc-members:
    :show-inheritance:
@@ -36,7 +36,7 @@ Result
 Score
 -----
 
-.. automodule:: tether.score
+.. automodule:: suture.score
    :members:
    :undoc-members:
    :show-inheritance:
@@ -44,22 +44,22 @@ Score
 Comparisons
 ~~~~~~~~~~~
 
-.. autoclass:: tether.score.comparisons.StringComparison
+.. autoclass:: suture.score.comparisons.StringComparison
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: tether.score.comparisons.ExactComparison
+.. autoclass:: suture.score.comparisons.ExactComparison
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: tether.score.comparisons.NumericComparison
+.. autoclass:: suture.score.comparisons.NumericComparison
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: tether.score.comparisons.DateComparison
+.. autoclass:: suture.score.comparisons.DateComparison
    :members:
    :undoc-members:
    :show-inheritance:
@@ -67,7 +67,7 @@ Comparisons
 Block
 -----
 
-.. automodule:: tether.block
+.. automodule:: suture.block
    :members:
    :undoc-members:
    :show-inheritance:
@@ -75,7 +75,7 @@ Block
 Decide
 ------
 
-.. automodule:: tether.decide
+.. automodule:: suture.decide
    :members:
    :undoc-members:
    :show-inheritance:
@@ -83,7 +83,7 @@ Decide
 Filter
 ------
 
-.. automodule:: tether.filter
+.. automodule:: suture.filter
    :members:
    :undoc-members:
    :show-inheritance:
@@ -91,7 +91,7 @@ Filter
 Preprocess
 ----------
 
-.. automodule:: tether.preprocess
+.. automodule:: suture.preprocess
    :members:
    :undoc-members:
    :show-inheritance:
@@ -99,7 +99,7 @@ Preprocess
 Deduplicate
 -----------
 
-.. automodule:: tether.deduplicate
+.. automodule:: suture.deduplicate
    :members:
    :undoc-members:
    :show-inheritance:
@@ -107,7 +107,7 @@ Deduplicate
 Inspect
 -------
 
-.. automodule:: tether.inspect
+.. automodule:: suture.inspect
    :members:
    :undoc-members:
    :show-inheritance:
@@ -115,7 +115,7 @@ Inspect
 Multipass
 ---------
 
-.. automodule:: tether.multipass
+.. automodule:: suture.multipass
    :members:
    :undoc-members:
    :show-inheritance:

@@ -2,9 +2,9 @@
 
 import pandas as pd
 import pytest
-from tether import ExactComparison, Pipeline, StringComparison
-from tether.core.pipeline import PipelineBuilder
-from tether.core.result import LinkageResult
+from suture import ExactComparison, Pipeline, StringComparison
+from suture.core.pipeline import PipelineBuilder
+from suture.core.result import LinkageResult
 
 
 class TestPipelineBuilder:

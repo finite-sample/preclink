@@ -1,21 +1,21 @@
 .PHONY: lint format typecheck deadcode doccheck test docs ci ci-docker clean install
 
 lint:
-	ruff check tether/ tests/
-	ruff format --check tether/ tests/
+	ruff check suture/ tests/
+	ruff format --check suture/ tests/
 
 format:
-	ruff check --fix tether/ tests/
-	ruff format tether/ tests/
+	ruff check --fix suture/ tests/
+	ruff format suture/ tests/
 
 typecheck:
-	mypy tether/
+	mypy suture/
 
 deadcode:
-	vulture tether/
+	vulture suture/
 
 doccheck:
-	pydoclint tether/
+	pydoclint suture/
 
 test:
 	pytest

@@ -1,8 +1,8 @@
-# tether
+# suture
 
-[![PyPI version](https://badge.fury.io/py/tether.svg)](https://badge.fury.io/py/tether)
-[![CI](https://github.com/finite-sample/tether/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/tether/actions/workflows/ci.yml)
-[![Documentation](https://readthedocs.org/projects/tether/badge/?version=latest)](https://tether.readthedocs.io)
+[![PyPI version](https://badge.fury.io/py/suture.svg)](https://badge.fury.io/py/suture)
+[![CI](https://github.com/finite-sample/suture/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/suture/actions/workflows/ci.yml)
+[![Documentation](https://readthedocs.org/projects/suture/badge/?version=latest)](https://suture.readthedocs.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 
@@ -11,14 +11,14 @@ High-precision record linkage library implementing a 7-step pipeline with multi-
 ## Installation
 
 ```bash
-pip install tether
+pip install suture
 ```
 
 ## Quick Start
 
 ```python
 import pandas as pd
-from tether import Pipeline, StringComparison, ExactComparison
+from suture import Pipeline, StringComparison, ExactComparison
 
 df_left = pd.DataFrame({
     "id": [1, 2, 3],
@@ -66,7 +66,7 @@ print(result.matches)
 For complex datasets, use multi-pass matching with progressively relaxed thresholds:
 
 ```python
-from tether import MultiPassOrchestrator, StringComparison
+from suture import MultiPassOrchestrator, StringComparison
 
 orchestrator = MultiPassOrchestrator()
 result = orchestrator.run(
@@ -100,7 +100,7 @@ result = orchestrator.run(
 
 ## Documentation
 
-Full documentation at [tether.readthedocs.io](https://tether.readthedocs.io)
+Full documentation at [suture.readthedocs.io](https://suture.readthedocs.io)
 
 ## License
 
