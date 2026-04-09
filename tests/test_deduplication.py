@@ -1,8 +1,8 @@
 """Tests for deduplication operations."""
 
 import pandas as pd
-from suture.deduplicate import ClusterDeduplicator, DeduplicationReport
-from suture.score.comparisons import ExactComparison, StringComparison
+from preclink.deduplicate import ClusterDeduplicator, DeduplicationReport
+from preclink.score.comparisons import ExactComparison, StringComparison
 
 
 class TestClusterDeduplicator:

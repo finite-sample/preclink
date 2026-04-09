@@ -1,8 +1,8 @@
-# suture
+# preclink
 
-[![PyPI version](https://badge.fury.io/py/suture.svg)](https://badge.fury.io/py/suture)
-[![CI](https://github.com/finite-sample/suture/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/suture/actions/workflows/ci.yml)
-[![Documentation](https://readthedocs.org/projects/suture/badge/?version=latest)](https://suture.readthedocs.io)
+[![PyPI version](https://badge.fury.io/py/preclink.svg)](https://badge.fury.io/py/preclink)
+[![CI](https://github.com/finite-sample/preclink/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/preclink/actions/workflows/ci.yml)
+[![Documentation](https://readthedocs.org/projects/preclink/badge/?version=latest)](https://preclink.readthedocs.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 
@@ -11,14 +11,14 @@ High-precision record linkage library implementing a 7-step pipeline with multi-
 ## Installation
 
 ```bash
-pip install suture
+pip install preclink
 ```
 
 ## Quick Start
 
 ```python
 import pandas as pd
-from suture import Pipeline, StringComparison, ExactComparison
+from preclink import Pipeline, StringComparison, ExactComparison
 
 df_left = pd.DataFrame({
     "id": [1, 2, 3],
@@ -66,7 +66,7 @@ print(result.matches)
 For complex datasets, use multi-pass matching with progressively relaxed thresholds:
 
 ```python
-from suture import MultiPassOrchestrator, StringComparison
+from preclink import MultiPassOrchestrator, StringComparison
 
 orchestrator = MultiPassOrchestrator()
 result = orchestrator.run(
@@ -100,7 +100,7 @@ result = orchestrator.run(
 
 ## Documentation
 
-Full documentation at [suture.readthedocs.io](https://suture.readthedocs.io)
+Full documentation at [preclink.readthedocs.io](https://preclink.readthedocs.io)
 
 ## License
 

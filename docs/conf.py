@@ -1,11 +1,11 @@
-"""Sphinx configuration for suture documentation."""
+"""Sphinx configuration for preclink documentation."""
 
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-project = "suture"
+project = "preclink"
 copyright = "2024, Gaurav Sood"
 author = "Gaurav Sood"
 

@@ -7,7 +7,7 @@ API Reference
 Core
 ----
 
-.. automodule:: suture.core
+.. automodule:: preclink.core
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,12 +15,12 @@ Core
 Pipeline
 ~~~~~~~~
 
-.. autoclass:: suture.core.pipeline.PipelineBuilder
+.. autoclass:: preclink.core.pipeline.PipelineBuilder
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: suture.core.pipeline.Pipeline
+.. autoclass:: preclink.core.pipeline.Pipeline
    :members:
    :undoc-members:
    :show-inheritance:
@@ -28,7 +28,7 @@ Pipeline
 Result
 ~~~~~~
 
-.. autoclass:: suture.core.result.LinkageResult
+.. autoclass:: preclink.core.result.LinkageResult
    :members:
    :undoc-members:
    :show-inheritance:
@@ -36,7 +36,7 @@ Result
 Score
 -----
 
-.. automodule:: suture.score
+.. automodule:: preclink.score
    :members:
    :undoc-members:
    :show-inheritance:
@@ -44,22 +44,22 @@ Score
 Comparisons
 ~~~~~~~~~~~
 
-.. autoclass:: suture.score.comparisons.StringComparison
+.. autoclass:: preclink.score.comparisons.StringComparison
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: suture.score.comparisons.ExactComparison
+.. autoclass:: preclink.score.comparisons.ExactComparison
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: suture.score.comparisons.NumericComparison
+.. autoclass:: preclink.score.comparisons.NumericComparison
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: suture.score.comparisons.DateComparison
+.. autoclass:: preclink.score.comparisons.DateComparison
    :members:
    :undoc-members:
    :show-inheritance:
@@ -67,7 +67,7 @@ Comparisons
 Block
 -----
 
-.. automodule:: suture.block
+.. automodule:: preclink.block
    :members:
    :undoc-members:
    :show-inheritance:
@@ -75,7 +75,7 @@ Block
 Decide
 ------
 
-.. automodule:: suture.decide
+.. automodule:: preclink.decide
    :members:
    :undoc-members:
    :show-inheritance:
@@ -83,7 +83,7 @@ Decide
 Filter
 ------
 
-.. automodule:: suture.filter
+.. automodule:: preclink.filter
    :members:
    :undoc-members:
    :show-inheritance:
@@ -91,7 +91,7 @@ Filter
 Preprocess
 ----------
 
-.. automodule:: suture.preprocess
+.. automodule:: preclink.preprocess
    :members:
    :undoc-members:
    :show-inheritance:
@@ -99,7 +99,7 @@ Preprocess
 Deduplicate
 -----------
 
-.. automodule:: suture.deduplicate
+.. automodule:: preclink.deduplicate
    :members:
    :undoc-members:
    :show-inheritance:
@@ -107,7 +107,7 @@ Deduplicate
 Inspect
 -------
 
-.. automodule:: suture.inspect
+.. automodule:: preclink.inspect
    :members:
    :undoc-members:
    :show-inheritance:
@@ -115,7 +115,7 @@ Inspect
 Multipass
 ---------
 
-.. automodule:: suture.multipass
+.. automodule:: preclink.multipass
    :members:
    :undoc-members:
    :show-inheritance:

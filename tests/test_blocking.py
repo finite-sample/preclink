@@ -1,8 +1,8 @@
 """Tests for blocking operations."""
 
 import pandas as pd
-from suture.block.blocker import FieldBlocker, FullBlocker
-from suture.block.crosswalk import Crosswalk
+from preclink.block.blocker import FieldBlocker, FullBlocker
+from preclink.block.crosswalk import Crosswalk
 
 
 class TestFieldBlocker:

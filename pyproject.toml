@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "suture"
+name = "preclink"
 dynamic = ["version"]
 description = "High-precision record linkage library with multi-pass support"
 readme = "README.md"
@@ -53,25 +53,25 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/finite-sample/suture"
-Documentation = "https://suture.readthedocs.io"
-Repository = "https://github.com/finite-sample/suture"
-Issues = "https://github.com/finite-sample/suture/issues"
+Homepage = "https://github.com/finite-sample/preclink"
+Documentation = "https://preclink.readthedocs.io"
+Repository = "https://github.com/finite-sample/preclink"
+Issues = "https://github.com/finite-sample/preclink/issues"
 
 [tool.hatch.version]
 source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "suture/_version.py"
+version-file = "preclink/_version.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["suture"]
+packages = ["preclink"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["suture"]
-exclude = ["suture/_version.py"]
+src = ["preclink"]
+exclude = ["preclink/_version.py"]
 
 [tool.ruff.lint]
 select = [
@@ -113,10 +113,10 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --cov=suture --cov-report=term-missing --cov-report=xml"
+addopts = "-v --cov=preclink --cov-report=term-missing --cov-report=xml"
 
 [tool.coverage.run]
-source = ["suture"]
+source = ["preclink"]
 branch = true
 
 [tool.coverage.report]
@@ -129,7 +129,7 @@ exclude_lines = [
 
 [tool.vulture]
 min_confidence = 80
-paths = ["suture"]
+paths = ["preclink"]
 
 [tool.pydoclint]
 style = "google"

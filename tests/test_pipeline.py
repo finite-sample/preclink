@@ -2,9 +2,9 @@
 
 import pandas as pd
 import pytest
-from suture import ExactComparison, Pipeline, StringComparison
-from suture.core.pipeline import PipelineBuilder
-from suture.core.result import LinkageResult
+from preclink import ExactComparison, Pipeline, StringComparison
+from preclink.core.pipeline import PipelineBuilder
+from preclink.core.result import LinkageResult
 
 
 class TestPipelineBuilder:

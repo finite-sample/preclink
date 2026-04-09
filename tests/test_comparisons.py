@@ -2,7 +2,7 @@
 
 import pandas as pd
 import pytest
-from suture.score.comparisons import (
+from preclink.score.comparisons import (
     DateComparison,
     ExactComparison,
     NumericComparison,

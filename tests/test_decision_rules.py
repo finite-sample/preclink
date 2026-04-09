@@ -2,9 +2,9 @@
 
 import pandas as pd
 import pytest
-from suture.decide.greedy import GreedyDecision
-from suture.decide.hungarian import HungarianDecision
-from suture.decide.row_sequential import RowSequentialDecision
+from preclink.decide.greedy import GreedyDecision
+from preclink.decide.hungarian import HungarianDecision
+from preclink.decide.row_sequential import RowSequentialDecision
 
 
 @pytest.fixture

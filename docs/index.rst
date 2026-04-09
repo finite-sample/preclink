@@ -1,4 +1,4 @@
-suture
+preclink
 ======
 
 High-precision record linkage library implementing a 7-step pipeline with multi-pass support.
@@ -14,7 +14,7 @@ Installation
 
 .. code-block:: bash
 
-   pip install suture
+   pip install preclink
 
 Quick Start
 -----------
@@ -22,7 +22,7 @@ Quick Start
 .. code-block:: python
 
    import pandas as pd
-   from suture import Pipeline, StringComparison, ExactComparison
+   from preclink import Pipeline, StringComparison, ExactComparison
 
    df_left = pd.DataFrame({
        "id": [1, 2, 3],
