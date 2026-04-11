@@ -5,6 +5,7 @@ from preclink.score.comparisons import (
     ExactComparison,
     NumericComparison,
     StringComparison,
+    TFIDFStringComparison,
 )
 from preclink.score.protocols import Comparison
 from preclink.score.scorer import PairwiseScorer
@@ -16,4 +17,5 @@ __all__ = [
     "NumericComparison",
     "PairwiseScorer",
     "StringComparison",
+    "TFIDFStringComparison",
 ]

@@ -20,7 +20,7 @@ from preclink.decide.row_sequential import RowSequentialDecision
 from preclink.filter.margin import MarginFilter
 from preclink.filter.threshold import ThresholdFilter
 from preclink.inspect.diagnostics import compute_diagnostics
-from preclink.preprocess.normalizer import TextNormalizer
+from preclink.preprocess.normalizer import CompletenessFilter, TextNormalizer
 from preclink.score.scorer import PairwiseScorer
 
 if TYPE_CHECKING:
@@ -46,6 +46,8 @@ class PipelineBuilder:
         strip_whitespace: bool = True,
         collapse_whitespace: bool = True,
         columns: list[str] | None = None,
+        min_completeness: float = 0.0,
+        required_columns: list[str] | None = None,
     ) -> Self:
         """Configure preprocessing stage.
 
@@ -55,6 +57,10 @@ class PipelineBuilder:
             strip_whitespace: Strip whitespace.
             collapse_whitespace: Collapse multiple whitespace.
             columns: Columns to preprocess.
+            min_completeness: Minimum completeness threshold (0.0 to 1.0).
+                Records with completeness below this threshold are dropped.
+            required_columns: Columns to check for completeness.
+                If None, all columns are checked.
 
         Returns:
             Self for method chaining.
@@ -65,6 +71,8 @@ class PipelineBuilder:
             strip_whitespace=strip_whitespace,
             collapse_whitespace=collapse_whitespace,
             columns=columns,
+            min_completeness=min_completeness,
+            required_columns=required_columns,
         )
         return self
 
@@ -184,6 +192,14 @@ class Pipeline:
         right_processed = right.copy()
 
         if self.preprocess_config is not None:
+            if self.preprocess_config.min_completeness > 0:
+                completeness_filter = CompletenessFilter(
+                    min_completeness=self.preprocess_config.min_completeness,
+                    required_columns=self.preprocess_config.required_columns,
+                )
+                left_processed, _ = completeness_filter.filter(left_processed)
+                right_processed, _ = completeness_filter.filter(right_processed)
+
             normalizer = TextNormalizer(
                 normalize_unicode=self.preprocess_config.normalize_unicode,
                 lowercase=self.preprocess_config.lowercase,

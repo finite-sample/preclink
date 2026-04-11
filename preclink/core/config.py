@@ -21,6 +21,10 @@ class PreprocessConfig:
         collapse_whitespace: Whether to collapse multiple whitespace.
         missing_policy: How to handle missing values.
         columns: Specific columns to preprocess.
+        min_completeness: Minimum completeness threshold (0.0 to 1.0).
+            Records with completeness below this threshold are dropped.
+        required_columns: Columns to check for completeness.
+            If None, all columns are checked.
     """
 
     normalize_unicode: bool = True
@@ -29,6 +33,8 @@ class PreprocessConfig:
     collapse_whitespace: bool = True
     missing_policy: MissingPolicy = "skip"
     columns: list[str] | None = None
+    min_completeness: float = 0.0
+    required_columns: list[str] | None = None
 
 
 @dataclass(frozen=True)

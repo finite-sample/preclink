@@ -7,6 +7,7 @@ from preclink.score.comparisons import (
     ExactComparison,
     NumericComparison,
     StringComparison,
+    TFIDFStringComparison,
 )
 
 
@@ -150,3 +151,91 @@ class TestDateComparison:
         scores = comp.compare(left, right)
         assert scores.iloc[0] == 1.0
         assert scores.iloc[1] == 0.0
+
+
+class TestTFIDFStringComparison:
+    def test_rare_value_higher_score(self):
+        comp = TFIDFStringComparison("name", algorithm="jaro_winkler")
+        left_values = pd.Series(["John Smith", "John Smith", "John Smith", "Jagmohan Trivikramji"])
+        right_values = pd.Series(["John Smith", "John Smith", "John Smith", "Jagmohan Trivikramji"])
+        comp.set_idf_weights(left_values, right_values)
+
+        common_left = pd.Series(["John Smith"])
+        common_right = pd.Series(["John Smith"])
+        rare_left = pd.Series(["Jagmohan Trivikramji"])
+        rare_right = pd.Series(["Jagmohan Trivikramji"])
+
+        common_scores = comp.compare(common_left, common_right)
+        rare_scores = comp.compare(rare_left, rare_right)
+
+        assert rare_scores.iloc[0] > common_scores.iloc[0]
+
+    def test_exact_match_without_idf(self):
+        comp = TFIDFStringComparison("name", algorithm="jaro_winkler")
+        left = pd.Series(["Alice", "Bob"])
+        right = pd.Series(["Alice", "Bob"])
+        scores = comp.compare(left, right)
+        assert scores.iloc[0] == pytest.approx(1.0)
+        assert scores.iloc[1] == pytest.approx(1.0)
+
+    def test_with_idf_setup(self):
+        comp = TFIDFStringComparison("name", algorithm="jaro_winkler")
+        all_left = pd.Series(["Alice", "Bob", "Alice", "Alice"])
+        all_right = pd.Series(["Alice", "Charlie", "Alice", "Bob"])
+        comp.set_idf_weights(all_left, all_right)
+
+        left = pd.Series(["Alice", "Bob"])
+        right = pd.Series(["Alice", "Bob"])
+        scores = comp.compare(left, right)
+
+        assert scores.iloc[1] > scores.iloc[0]
+
+    def test_missing_values(self):
+        comp = TFIDFStringComparison("name")
+        left = pd.Series(["Alice", None, "Bob"])
+        right = pd.Series(["Alice", "Jane", None])
+        scores = comp.compare(left, right)
+        assert scores.iloc[0] > 0
+        assert scores.iloc[1] == 0.0
+        assert scores.iloc[2] == 0.0
+
+    def test_levenshtein_algorithm(self):
+        comp = TFIDFStringComparison("name", algorithm="levenshtein")
+        left = pd.Series(["John"])
+        right = pd.Series(["Jon"])
+        scores = comp.compare(left, right)
+        assert scores.iloc[0] > 0.5
+
+    def test_damerau_levenshtein_algorithm(self):
+        comp = TFIDFStringComparison("name", algorithm="damerau_levenshtein")
+        left = pd.Series(["John"])
+        right = pd.Series(["Jonh"])
+        scores = comp.compare(left, right)
+        assert scores.iloc[0] > 0.5
+
+    def test_weight(self):
+        comp = TFIDFStringComparison("name", weight=2.0)
+        assert comp.weight == 2.0
+
+    def test_idf_computation(self):
+        comp = TFIDFStringComparison("name")
+        left = pd.Series(["A", "A", "A", "B"])
+        right = pd.Series(["A", "A", "C", "C"])
+        comp.set_idf_weights(left, right)
+
+        idf_a = comp._get_idf_weight("A")
+        idf_b = comp._get_idf_weight("B")
+        idf_c = comp._get_idf_weight("C")
+
+        assert idf_b > idf_a
+        assert idf_c > idf_a
+        assert idf_b > idf_c
+
+    def test_empty_values(self):
+        comp = TFIDFStringComparison("name")
+        empty_left = pd.Series([], dtype=str)
+        empty_right = pd.Series([], dtype=str)
+        comp.set_idf_weights(empty_left, empty_right)
+
+        assert comp._max_idf == 1.0
+        assert comp._get_idf_weight("anything") == 1.0

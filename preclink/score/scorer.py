@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 
+from preclink.score.comparisons import TFIDFStringComparison
+
 if TYPE_CHECKING:
     from preclink.score.protocols import Comparison
 
@@ -19,6 +21,19 @@ class PairwiseScorer:
         """
         self.comparisons = comparisons
 
+    def _setup_idf_weights(self, pairs: pd.DataFrame) -> None:
+        """Set up IDF weights for TFIDFStringComparison instances.
+
+        Args:
+            pairs: DataFrame with candidate pairs.
+        """
+        for comparison in self.comparisons:
+            if isinstance(comparison, TFIDFStringComparison):
+                left_col = f"{comparison.column}_left"
+                right_col = f"{comparison.column}_right"
+                if left_col in pairs.columns and right_col in pairs.columns:
+                    comparison.set_idf_weights(pairs[left_col], pairs[right_col])
+
     def score(self, pairs: pd.DataFrame) -> pd.DataFrame:
         """Compute similarity scores for candidate pairs.
 
@@ -29,6 +44,8 @@ class PairwiseScorer:
         Returns:
             DataFrame with original pairs plus score columns and aggregate score.
         """
+        self._setup_idf_weights(pairs)
+
         result = pairs.copy()
         total_weight = sum(c.weight for c in self.comparisons)
 

@@ -1,6 +1,6 @@
 """Comparison implementations for different data types."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
@@ -125,7 +125,7 @@ class NumericComparison:
             scores = np.exp(-0.5 * (diff / sigma) ** 2)
 
         scores_masked = scores.where(both_valid, 0.0)
-        result: pd.Series[Any] = pd.Series(list(scores_masked), index=left.index)
+        result: pd.Series = pd.Series(list(scores_masked), index=left.index)
         return result
 
 
@@ -165,5 +165,109 @@ class DateComparison:
             scores = np.maximum(0.0, 1.0 - diff_days / self.tolerance_days)
 
         scores_masked = scores.where(both_valid, 0.0)
-        result: pd.Series[Any] = pd.Series(list(scores_masked), index=left.index)
+        result: pd.Series = pd.Series(list(scores_masked), index=left.index)
         return result
+
+
+@dataclass(slots=True)
+class TFIDFStringComparison:
+    """String comparison with TF-IDF weighting.
+
+    Rare value matches provide stronger evidence than common value matches.
+    For example, a match on "Jagmohan Trivikramji" is strong evidence of a
+    true match because few people have that name, while a match on
+    "John Smith" is weak evidence.
+
+    The IDF weight is computed from both tables as:
+        idf(v) = log(N / df(v))
+    where N is the total number of records and df(v) is the count of records
+    containing value v.
+
+    Final score = base_similarity * idf_weight (normalized to [0, 1])
+
+    Args:
+        column: Column name to compare.
+        algorithm: Similarity algorithm to use.
+        weight: Weight for this comparison in aggregate score.
+    """
+
+    column: str
+    algorithm: StringAlgorithm = "jaro_winkler"
+    weight: float = 1.0
+    _idf_weights: dict[str, float] = field(default_factory=dict, repr=False)
+    _max_idf: float = field(default=1.0, repr=False)
+
+    def set_idf_weights(self, left_values: pd.Series, right_values: pd.Series) -> None:
+        """Compute IDF weights from both datasets.
+
+        This should be called before compare() to set up the IDF weights.
+
+        Args:
+            left_values: All values from the left dataset column.
+            right_values: All values from the right dataset column.
+        """
+        all_values = pd.concat([left_values, right_values], ignore_index=True)
+        all_values = all_values.dropna().astype(str)
+
+        n = len(all_values)
+        if n == 0:
+            self._idf_weights = {}
+            self._max_idf = 1.0
+            return
+
+        value_counts = all_values.value_counts()
+        idf_weights: dict[str, float] = {}
+        for value, count in value_counts.items():
+            idf_weights[str(value)] = float(np.log(n / count))
+
+        self._idf_weights = idf_weights
+        self._max_idf = max(idf_weights.values()) if idf_weights else 1.0
+
+    def _get_idf_weight(self, value: str) -> float:
+        """Get normalized IDF weight for a value.
+
+        Args:
+            value: The string value.
+
+        Returns:
+            Normalized IDF weight between 0 and 1.
+        """
+        if not self._idf_weights or self._max_idf == 0:
+            return 1.0
+        idf = self._idf_weights.get(value, self._max_idf)
+        return idf / self._max_idf
+
+    def compare(self, left: pd.Series, right: pd.Series) -> pd.Series:
+        """Compare string values with TF-IDF weighting.
+
+        Args:
+            left: Left series of string values.
+            right: Right series of string values.
+
+        Returns:
+            Series of TF-IDF weighted similarity scores between 0 and 1.
+        """
+        func: Callable[[Any, Any], float]
+        if self.algorithm == "jaro_winkler":
+            func = rf_distance.JaroWinkler.normalized_similarity
+        elif self.algorithm == "levenshtein":
+            func = rf_distance.Levenshtein.normalized_similarity
+        elif self.algorithm == "damerau_levenshtein":
+            func = rf_distance.DamerauLevenshtein.normalized_similarity
+        else:
+            msg = f"Unknown algorithm: {self.algorithm}"
+            raise ValueError(msg)
+
+        scores = []
+        for l_val, r_val in zip(left, right, strict=True):
+            if pd.isna(l_val) or pd.isna(r_val):
+                scores.append(0.0)
+            else:
+                l_str, r_str = str(l_val), str(r_val)
+                base_score = func(l_str, r_str)
+                idf_left = self._get_idf_weight(l_str)
+                idf_right = self._get_idf_weight(r_str)
+                idf_weight = (idf_left + idf_right) / 2
+                scores.append(base_score * idf_weight)
+
+        return pd.Series(scores, index=left.index)

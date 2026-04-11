@@ -6,10 +6,16 @@ from scipy.optimize import linear_sum_assignment
 
 
 class HungarianDecision:
-    """Optimal assignment using the Hungarian algorithm.
+    """Optimal assignment using maximum-weight bipartite matching.
 
     Maximizes total matching score while ensuring each record is matched
     at most once.
+
+    Implementation note:
+        Uses scipy.optimize.linear_sum_assignment which internally implements
+        the Jonker-Volgenant algorithm (since scipy 1.4.0), an improvement
+        over the original Hungarian algorithm with better worst-case complexity.
+        See: https://doi.org/10.1007/BF02278710
     """
 
     def decide(self, scored_pairs: pd.DataFrame) -> pd.DataFrame:
