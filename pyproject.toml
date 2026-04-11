@@ -45,6 +45,8 @@ dev = [
     "ruff>=0.3.0",
     "vulture>=2.10",
     "pydoclint>=0.4.0",
+    "hypothesis>=6.100.0",
+    "scikit-learn>=1.4.0",
 ]
 docs = [
     "sphinx>=7.0.0",

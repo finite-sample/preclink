@@ -178,12 +178,10 @@ class TFIDFStringComparison:
     true match because few people have that name, while a match on
     "John Smith" is weak evidence.
 
-    The IDF weight is computed from both tables as:
-        idf(v) = log(N / df(v))
-    where N is the total number of records and df(v) is the count of records
-    containing value v.
-
-    Final score = base_similarity * idf_weight (normalized to [0, 1])
+    The IDF weight is computed from both tables. The formula is
+    ``idf(v) = log(N / df(v))`` where N is the total number of records
+    and df(v) is the count of records containing value v. The final score
+    is ``base_similarity * idf_weight``, normalized to the range [0, 1].
 
     Args:
         column: Column name to compare.
