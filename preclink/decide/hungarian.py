@@ -36,7 +36,14 @@ class HungarianDecision:
         left_map = {v: i for i, v in enumerate(left_indices)}
         right_map = {v: i for i, v in enumerate(right_indices)}
 
-        cost_matrix = np.full((len(left_indices), len(right_indices)), np.inf)
+        n_left = len(left_indices)
+        n_right = len(right_indices)
+
+        if n_left == 0 or n_right == 0:
+            return scored_pairs.iloc[:0]
+
+        large_cost = 1e10
+        cost_matrix = np.full((n_left, n_right), large_cost)
 
         for _, row in scored_pairs.iterrows():
             i = left_map[row["left_index"]]
@@ -47,7 +54,7 @@ class HungarianDecision:
 
         matches = []
         for i, j in zip(row_ind, col_ind, strict=True):
-            if cost_matrix[i, j] < np.inf:
+            if cost_matrix[i, j] < large_cost:
                 left_idx = left_indices[i]
                 right_idx = right_indices[j]
                 match_row = scored_pairs[

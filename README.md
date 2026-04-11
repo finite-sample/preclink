@@ -99,6 +99,31 @@ result = orchestrator.run(
 - Crosswalk support for blocking key normalization
 - Margin-based filtering for ambiguity removal
 
+## Benchmarks
+
+Comparison against [recordlinkage](https://github.com/J535D165/recordlinkage) on standard Febrl datasets:
+
+| Dataset | Library | Precision | Recall | F1 |
+|---------|---------|-----------|--------|-----|
+| febrl1 | preclink | **100.0%** | 76.4% | 86.6% |
+| febrl1 | recordlinkage | 99.5% | 79.0% | 88.1% |
+| febrl2 | preclink | **97.3%** | 39.5% | 56.2% |
+| febrl2 | recordlinkage | 95.0% | 80.0% | 86.9% |
+| febrl3 | preclink | **99.2%** | 35.4% | 52.2% |
+| febrl3 | recordlinkage | 98.1% | 79.6% | 87.9% |
+| febrl4 | preclink | **99.9%** | 79.0% | **88.2%** |
+| febrl4 | recordlinkage | 94.3% | 80.8% | 87.0% |
+
+**febrl4** is the true record linkage scenario (linking two separate tables). On this dataset, preclink achieves 99.9% precision with higher F1 than recordlinkage. The other datasets (febrl1-3) are deduplication tasks where records are split artificially.
+
+**When to use preclink**: When false positives are costly (merging administrative records, survey linking, research applications) and you need provably optimal 1:1 matching.
+
+Reproduce:
+```bash
+pip install recordlinkage
+python examples/benchmark_febrl.py
+```
+
 ## Documentation
 
 Full documentation at [preclink.readthedocs.io](https://preclink.readthedocs.io)
