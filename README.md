@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/preclink.svg)](https://badge.fury.io/py/preclink)
 [![Downloads](https://pepy.tech/badge/preclink)](https://pepy.tech/project/preclink)
 [![CI](https://github.com/finite-sample/preclink/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/preclink/actions/workflows/ci.yml)
-[![Documentation](https://readthedocs.org/projects/preclink/badge/?version=latest)](https://preclink.readthedocs.io)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://finite-sample.github.io/preclink)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 
@@ -126,7 +126,7 @@ python examples/benchmark_febrl.py
 
 ## Documentation
 
-Full documentation at [preclink.readthedocs.io](https://preclink.readthedocs.io)
+Full documentation at [finite-sample.github.io/preclink](https://finite-sample.github.io/preclink)
 
 ## License
 
