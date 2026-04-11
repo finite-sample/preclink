@@ -56,7 +56,7 @@ docs = [
 
 [project.urls]
 Homepage = "https://github.com/finite-sample/preclink"
-Documentation = "https://preclink.readthedocs.io"
+Documentation = "https://finite-sample.github.io/preclink"
 Repository = "https://github.com/finite-sample/preclink"
 Issues = "https://github.com/finite-sample/preclink/issues"
 
