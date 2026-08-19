@@ -25,7 +25,13 @@ def sample_right_df():
             "first_name": ["Jon", "Jane", "Robert", "Alice", "Charlie"],
             "last_name": ["Smith", "Doe", "Johnson", "Williams", "Brown"],
             "state": ["CA", "NY", "CA", "TX", "FL"],
-            "dob": ["1990-01-15", "1985-06-20", "1992-03-10", "1988-12-05", "1995-07-22"],
+            "dob": [
+                "1990-01-15",
+                "1985-06-20",
+                "1992-03-10",
+                "1988-12-05",
+                "1995-07-22",
+            ],
         }
     )
 

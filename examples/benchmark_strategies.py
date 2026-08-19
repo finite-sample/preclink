@@ -18,6 +18,7 @@ from dataclasses import dataclass
 
 import numpy as np
 import pandas as pd
+
 from preclink import (
     ExactComparison,
     Pipeline,
@@ -162,24 +163,28 @@ def generate_benchmark_data(
 
         return "".join(chars)
 
-    records = []
-    for i in range(n_records):
-        records.append(
-            {
-                "id": f"src-{i:04d}",
-                "first_name": rng.choice(first_names),
-                "last_name": rng.choice(last_names),
-                "dob": f"19{rng.randint(50, 99)}-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}",
-                "city": rng.choice(cities),
-                "state": rng.choice(states),
-            }
-        )
+    records = [
+        {
+            "id": f"src-{i:04d}",
+            "first_name": rng.choice(first_names),
+            "last_name": rng.choice(last_names),
+            "dob": (
+                f"19{rng.randint(50, 99)}-"
+                f"{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}"
+            ),
+            "city": rng.choice(cities),
+            "state": rng.choice(states),
+        }
+        for i in range(n_records)
+    ]
 
     source_df = pd.DataFrame(records)
 
     duplicates = []
     ground_truth = set()
-    dup_indices = np_rng.choice(n_records, size=min(n_duplicates, n_records), replace=False)
+    dup_indices = np_rng.choice(
+        n_records, size=min(n_duplicates, n_records), replace=False
+    )
 
     for idx in dup_indices:
         orig = records[idx].copy()
@@ -195,17 +200,20 @@ def generate_benchmark_data(
         ground_truth.add((orig["id"], dup["id"]))
 
     non_dup_count = n_duplicates // 2
-    for i in range(non_dup_count):
-        duplicates.append(
-            {
-                "id": f"tgt-new-{i:04d}",
-                "first_name": rng.choice(first_names),
-                "last_name": rng.choice(last_names),
-                "dob": f"19{rng.randint(50, 99)}-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}",
-                "city": rng.choice(cities),
-                "state": rng.choice(states),
-            }
-        )
+    duplicates.extend(
+        {
+            "id": f"tgt-new-{i:04d}",
+            "first_name": rng.choice(first_names),
+            "last_name": rng.choice(last_names),
+            "dob": (
+                f"19{rng.randint(50, 99)}-"
+                f"{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}"
+            ),
+            "city": rng.choice(cities),
+            "state": rng.choice(states),
+        }
+        for i in range(non_dup_count)
+    )
 
     target_df = pd.DataFrame(duplicates)
 
@@ -223,7 +231,11 @@ def compute_metrics(
     true_positives = len(found_pairs & ground_truth)
     precision = true_positives / len(found_pairs) if found_pairs else 0.0
     recall = true_positives / len(ground_truth) if ground_truth else 0.0
-    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
+    f1 = (
+        2 * precision * recall / (precision + recall)
+        if (precision + recall) > 0
+        else 0.0
+    )
 
     return precision, recall, f1
 
@@ -242,7 +254,9 @@ def benchmark_decision_methods(
             .preprocess(lowercase=True)
             .score(
                 [
-                    StringComparison("first_name", algorithm="jaro_winkler", weight=2.0),
+                    StringComparison(
+                        "first_name", algorithm="jaro_winkler", weight=2.0
+                    ),
                     StringComparison("last_name", algorithm="jaro_winkler", weight=2.0),
                     ExactComparison("dob", weight=1.0),
                 ]
@@ -256,7 +270,9 @@ def benchmark_decision_methods(
         result = pipeline.link(source_df, target_df)
         runtime_ms = (time.perf_counter() - start) * 1000
 
-        found_pairs = set(zip(result.matches["id_left"], result.matches["id_right"], strict=True))
+        found_pairs = set(
+            zip(result.matches["id_left"], result.matches["id_right"], strict=True)
+        )
 
         precision, recall, f1 = compute_metrics(found_pairs, ground_truth)
 
@@ -301,7 +317,9 @@ def benchmark_string_algorithms(
         result = pipeline.link(source_df, target_df)
         runtime_ms = (time.perf_counter() - start) * 1000
 
-        found_pairs = set(zip(result.matches["id_left"], result.matches["id_right"], strict=True))
+        found_pairs = set(
+            zip(result.matches["id_left"], result.matches["id_right"], strict=True)
+        )
 
         precision, recall, f1 = compute_metrics(found_pairs, ground_truth)
 
@@ -344,7 +362,9 @@ def benchmark_tfidf_vs_standard(
     result = pipeline_standard.link(source_df, target_df)
     runtime_ms = (time.perf_counter() - start) * 1000
 
-    found_pairs = set(zip(result.matches["id_left"], result.matches["id_right"], strict=True))
+    found_pairs = set(
+        zip(result.matches["id_left"], result.matches["id_right"], strict=True)
+    )
 
     precision, recall, f1 = compute_metrics(found_pairs, ground_truth)
 
@@ -359,8 +379,12 @@ def benchmark_tfidf_vs_standard(
         )
     )
 
-    tfidf_first = TFIDFStringComparison("first_name", algorithm="jaro_winkler", weight=2.0)
-    tfidf_last = TFIDFStringComparison("last_name", algorithm="jaro_winkler", weight=2.0)
+    tfidf_first = TFIDFStringComparison(
+        "first_name", algorithm="jaro_winkler", weight=2.0
+    )
+    tfidf_last = TFIDFStringComparison(
+        "last_name", algorithm="jaro_winkler", weight=2.0
+    )
     tfidf_first.set_idf_weights(source_df["first_name"], target_df["first_name"])
     tfidf_last.set_idf_weights(source_df["last_name"], target_df["last_name"])
 
@@ -376,7 +400,9 @@ def benchmark_tfidf_vs_standard(
     result = pipeline_tfidf.link(source_df, target_df)
     runtime_ms = (time.perf_counter() - start) * 1000
 
-    found_pairs = set(zip(result.matches["id_left"], result.matches["id_right"], strict=True))
+    found_pairs = set(
+        zip(result.matches["id_left"], result.matches["id_right"], strict=True)
+    )
 
     precision, recall, f1 = compute_metrics(found_pairs, ground_truth)
 
@@ -419,7 +445,9 @@ def benchmark_blocking(
     result = pipeline_no_block.link(source_df, target_df)
     runtime_ms = (time.perf_counter() - start) * 1000
 
-    found_pairs = set(zip(result.matches["id_left"], result.matches["id_right"], strict=True))
+    found_pairs = set(
+        zip(result.matches["id_left"], result.matches["id_right"], strict=True)
+    )
 
     precision, recall, f1 = compute_metrics(found_pairs, ground_truth)
 
@@ -452,7 +480,9 @@ def benchmark_blocking(
     result = pipeline_blocked.link(source_df, target_df)
     runtime_ms = (time.perf_counter() - start) * 1000
 
-    found_pairs = set(zip(result.matches["id_left"], result.matches["id_right"], strict=True))
+    found_pairs = set(
+        zip(result.matches["id_left"], result.matches["id_right"], strict=True)
+    )
 
     precision, recall, f1 = compute_metrics(found_pairs, ground_truth)
 
@@ -484,7 +514,9 @@ def benchmark_thresholds(
             .preprocess(lowercase=True)
             .score(
                 [
-                    StringComparison("first_name", algorithm="jaro_winkler", weight=2.0),
+                    StringComparison(
+                        "first_name", algorithm="jaro_winkler", weight=2.0
+                    ),
                     StringComparison("last_name", algorithm="jaro_winkler", weight=2.0),
                     ExactComparison("dob", weight=1.0),
                 ]
@@ -497,7 +529,9 @@ def benchmark_thresholds(
         result = pipeline.link(source_df, target_df)
         runtime_ms = (time.perf_counter() - start) * 1000
 
-        found_pairs = set(zip(result.matches["id_left"], result.matches["id_right"], strict=True))
+        found_pairs = set(
+            zip(result.matches["id_left"], result.matches["id_right"], strict=True)
+        )
 
         precision, recall, f1 = compute_metrics(found_pairs, ground_truth)
 
@@ -520,7 +554,9 @@ def print_results(title: str, results: list[BenchmarkResult]) -> None:
     print(f"\n{'=' * 70}")
     print(f" {title}")
     print("=" * 70)
-    print(f"{'Strategy':<25} {'Precision':>10} {'Recall':>10} {'F1':>10} {'Time(ms)':>10}")
+    print(
+        f"{'Strategy':<25} {'Precision':>10} {'Recall':>10} {'F1':>10} {'Time(ms)':>10}"
+    )
     print("-" * 70)
 
     for r in results:

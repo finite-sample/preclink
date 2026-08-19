@@ -1,6 +1,7 @@
 """Tests for deduplication operations."""
 
 import pandas as pd
+
 from preclink.deduplicate import ClusterDeduplicator, DeduplicationReport
 from preclink.score.comparisons import ExactComparison, StringComparison
 
@@ -34,7 +35,9 @@ class TestClusterDeduplicator:
             }
         )
         dedup = ClusterDeduplicator(
-            [ExactComparison("name"), ExactComparison("city")], threshold=0.9, margin=0.0
+            [ExactComparison("name"), ExactComparison("city")],
+            threshold=0.9,
+            margin=0.0,
         )
         result, report = dedup.deduplicate(df)
 
@@ -50,7 +53,9 @@ class TestClusterDeduplicator:
             }
         )
         dedup = ClusterDeduplicator(
-            [StringComparison("name"), ExactComparison("city")], threshold=0.5, margin=0.0
+            [StringComparison("name"), ExactComparison("city")],
+            threshold=0.5,
+            margin=0.0,
         )
         _, report = dedup.deduplicate(df)
 
@@ -66,7 +71,11 @@ class TestClusterDeduplicator:
             }
         )
         dedup = ClusterDeduplicator(
-            [ExactComparison("name"), ExactComparison("city"), ExactComparison("state")],
+            [
+                ExactComparison("name"),
+                ExactComparison("city"),
+                ExactComparison("state"),
+            ],
             threshold=0.3,
             margin=0.1,
         )
@@ -88,7 +97,9 @@ class TestClusterDeduplicator:
             }
         )
         dedup = ClusterDeduplicator(
-            [ExactComparison("name"), ExactComparison("city")], threshold=0.9, margin=0.1
+            [ExactComparison("name"), ExactComparison("city")],
+            threshold=0.9,
+            margin=0.1,
         )
         result, report = dedup.deduplicate(df)
 
@@ -105,13 +116,17 @@ class TestClusterDeduplicator:
             }
         )
         dedup = ClusterDeduplicator(
-            [ExactComparison("name"), ExactComparison("city")], threshold=0.9, margin=0.1
+            [ExactComparison("name"), ExactComparison("city")],
+            threshold=0.9,
+            margin=0.1,
         )
         result, report = dedup.deduplicate(df)
 
         assert report.original_count == 5
         assert report.kept_count == len(result)
-        total_dropped = report.dropped_as_duplicate + report.dropped_as_indistinguishable
+        total_dropped = (
+            report.dropped_as_duplicate + report.dropped_as_indistinguishable
+        )
         assert report.original_count - report.kept_count == total_dropped
 
     def test_empty_dataframe(self):
@@ -150,7 +165,7 @@ class TestClusterDeduplicator:
             margin=0.05,
             timestamp_column="updated",
         )
-        result, report = dedup.deduplicate(df)
+        result, _report = dedup.deduplicate(df)
 
         assert len(result) == 1
         assert result["updated"].iloc[0] == "2024-01-01"
@@ -179,7 +194,9 @@ class TestClusterDeduplicator:
             }
         )
         dedup = ClusterDeduplicator(
-            [ExactComparison("name"), ExactComparison("city")], threshold=0.9, margin=0.0
+            [ExactComparison("name"), ExactComparison("city")],
+            threshold=0.9,
+            margin=0.0,
         )
         _, report = dedup.deduplicate(df)
 

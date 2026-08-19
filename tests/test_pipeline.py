@@ -2,6 +2,7 @@
 
 import pandas as pd
 import pytest
+
 from preclink import ExactComparison, Pipeline, StringComparison
 from preclink.core.pipeline import PipelineBuilder
 from preclink.core.result import LinkageResult
@@ -25,7 +26,9 @@ class TestPipelineBuilder:
             builder.build()
 
     def test_build_with_minimum_config(self):
-        pipeline = PipelineBuilder().score(comparisons=[StringComparison("name")]).build()
+        pipeline = (
+            PipelineBuilder().score(comparisons=[StringComparison("name")]).build()
+        )
         assert pipeline is not None
 
 

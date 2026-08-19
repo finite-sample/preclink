@@ -2,6 +2,7 @@
 
 import pandas as pd
 import pytest
+
 from preclink.score.comparisons import (
     DateComparison,
     ExactComparison,
@@ -156,8 +157,12 @@ class TestDateComparison:
 class TestTFIDFStringComparison:
     def test_rare_value_higher_score(self):
         comp = TFIDFStringComparison("name", algorithm="jaro_winkler")
-        left_values = pd.Series(["John Smith", "John Smith", "John Smith", "Jagmohan Trivikramji"])
-        right_values = pd.Series(["John Smith", "John Smith", "John Smith", "Jagmohan Trivikramji"])
+        left_values = pd.Series(
+            ["John Smith", "John Smith", "John Smith", "Jagmohan Trivikramji"]
+        )
+        right_values = pd.Series(
+            ["John Smith", "John Smith", "John Smith", "Jagmohan Trivikramji"]
+        )
         comp.set_idf_weights(left_values, right_values)
 
         common_left = pd.Series(["John Smith"])
