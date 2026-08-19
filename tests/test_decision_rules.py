@@ -2,6 +2,7 @@
 
 import pandas as pd
 import pytest
+
 from preclink.decide.greedy import GreedyDecision
 from preclink.decide.hungarian import HungarianDecision
 from preclink.decide.row_sequential import RowSequentialDecision

@@ -1,13 +1,14 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.12.5,<0.13"]
+build-backend = "uv_build"
 
 [project]
 name = "preclink"
-dynamic = ["version"]
+version = "1.2.0"
 description = "High-precision record linkage library with multi-pass support"
 readme = "README.md"
 license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 authors = [{ name = "Gaurav Sood", email = "gsood07@gmail.com" }]
 keywords = [
@@ -21,7 +22,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
@@ -36,89 +36,86 @@ dependencies = [
     "numpy>=1.26.0",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=8.0.0",
-    "pytest-cov>=4.0.0",
-    "mypy>=1.8.0",
-    "pandas-stubs>=2.0.0",
-    "ruff>=0.3.0",
-    "vulture>=2.10",
-    "pydoclint>=0.4.0",
-    "hypothesis>=6.100.0",
-    "scikit-learn>=1.4.0",
-]
-docs = [
-    "sphinx>=7.0.0",
-    "furo>=2024.1.0",
-    "sphinx-autodoc-typehints>=2.0.0",
-]
-
 [project.urls]
 Homepage = "https://github.com/finite-sample/preclink"
 Documentation = "https://finite-sample.github.io/preclink"
 Repository = "https://github.com/finite-sample/preclink"
 Issues = "https://github.com/finite-sample/preclink/issues"
 
-[tool.hatch.version]
-source = "vcs"
+[tool.uv.build-backend]
+module-name = "preclink"
 
-[tool.hatch.build.hooks.vcs]
-version-file = "preclink/_version.py"
-
-[tool.hatch.build.targets.wheel]
-packages = ["preclink"]
+[dependency-groups]
+dev = [
+    "ruff>=0.14",
+    "pyright>=1.1.390",
+    "pydoclint>=0.5",
+    "pre-commit>=4",
+    { include-group = "test" },
+]
+test = [
+    "pytest>=8",
+    "pytest-cov>=6",
+    "hypothesis>=6.100.0",
+    # test_realistic_data builds its evaluation fixtures with sklearn.
+    "scikit-learn>=1.4.0",
+]
+docs = [
+    "sphinx>=8",
+    "py-canon @ git+https://github.com/gojiplus/py-canon@v1",
+    "furo",
+    "myst-parser",
+    "sphinx-copybutton",
+]
 
 [tool.ruff]
-line-length = 100
+line-length = 88
 target-version = "py312"
-src = ["preclink"]
-exclude = ["preclink/_version.py"]
 
 [tool.ruff.lint]
+external = ["DOC"]
 select = [
-    "E",    # pycodestyle errors
-    "F",    # pyflakes
-    "W",    # pycodestyle warnings
-    "I",    # isort
-    "N",    # pep8-naming
-    "D",    # pydocstyle
-    "UP",   # pyupgrade
-    "ANN",  # flake8-annotations
-    "B",    # flake8-bugbear
-    "C4",   # flake8-comprehensions
-    "SIM",  # flake8-simplify
-    "TCH",  # flake8-type-checking
+    "E", "W", "F", "I", "B", "C4", "UP", "N", "D", "S", "SIM", "T20", "PT", "RUF",
+    "PTH", "RET", "PIE", "FURB", "PERF", "DTZ", "LOG", "G", "TC", "FLY",
+    "RSE", "SLOT", "FA", "A", "EXE", "ICN", "PGH", "PLE", "ARG", "SLF", "ANN",
 ]
-ignore = [
-    "D100",
-    "D104",
-    "D107",
-]
+# D203/D213: the google convention the fleet standard picks. W191/D206/D300:
+# ruff's own docs list these as always incompatible with `ruff format`, which
+# the standard also runs. D100/D104/D107: module, package and __init__
+# docstrings are covered by the class docstring in this codebase.
+ignore = ["D203", "D213", "W191", "D206", "D300", "D100", "D104", "D107"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["D", "ANN"]
+# Unused fixture arguments and private-member access are how tests are written.
+# S311: the synthetic record fixtures seed `random` for reproducibility; there
+# is nothing cryptographic about generated names and addresses.
+"tests/**" = ["S101", "D", "ARG", "SLF", "ANN", "S311"]
+"docs/**" = ["D"]
+# Benchmarks are scripts: they print their results and seed with `random`.
+"examples/**" = ["D", "ANN", "T20", "S311"]
 
-[tool.mypy]
-python_version = "3.12"
-strict = true
-warn_return_any = true
-warn_unused_ignores = true
-show_error_codes = true
+[tool.pyright]
+include = ["src"]
+typeCheckingMode = "standard"
 
-[[tool.mypy.overrides]]
-module = ["rapidfuzz.*", "scipy.*"]
-ignore_missing_imports = true
+[tool.pydoclint]
+style = "google"
+arg-type-hints-in-docstring = false
+check-return-types = false
+check-yield-types = false
+check-class-attributes = false
+allow-init-docstring = true
+skip-checking-raises = true
+exclude = '\.venv|tests|docs'
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --cov=preclink --cov-report=term-missing --cov-report=xml"
 
 [tool.coverage.run]
-source = ["preclink"]
+source = ["src"]
 branch = true
 
 [tool.coverage.report]
@@ -129,15 +126,4 @@ exclude_lines = [
     "@overload",
 ]
 
-[tool.vulture]
-min_confidence = 80
-paths = ["preclink"]
-
-[tool.pydoclint]
-style = "google"
-check-return-types = false
-check-yield-types = false
-arg-type-hints-in-docstring = false
-skip-checking-raises = true
-allow-init-docstring = true
-check-class-attributes = false
+[tool.preen]

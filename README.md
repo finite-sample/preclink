@@ -21,28 +21,34 @@ pip install preclink
 import pandas as pd
 from preclink import Pipeline, StringComparison, ExactComparison
 
-df_left = pd.DataFrame({
-    "id": [1, 2, 3],
-    "first_name": ["John", "Jane", "Bob"],
-    "last_name": ["Smith", "Doe", "Johnson"],
-    "state": ["CA", "NY", "CA"],
-})
+df_left = pd.DataFrame(
+    {
+        "id": [1, 2, 3],
+        "first_name": ["John", "Jane", "Bob"],
+        "last_name": ["Smith", "Doe", "Johnson"],
+        "state": ["CA", "NY", "CA"],
+    }
+)
 
-df_right = pd.DataFrame({
-    "id": [101, 102, 103],
-    "first_name": ["Jon", "Jane", "Robert"],
-    "last_name": ["Smith", "Doe", "Johnson"],
-    "state": ["CA", "NY", "CA"],
-})
+df_right = pd.DataFrame(
+    {
+        "id": [101, 102, 103],
+        "first_name": ["Jon", "Jane", "Robert"],
+        "last_name": ["Smith", "Doe", "Johnson"],
+        "state": ["CA", "NY", "CA"],
+    }
+)
 
 result = (
     Pipeline()
     .preprocess(normalize_unicode=True, lowercase=True)
     .block(on="state")
-    .score(comparisons=[
-        StringComparison("first_name", algorithm="jaro_winkler"),
-        StringComparison("last_name", algorithm="jaro_winkler"),
-    ])
+    .score(
+        comparisons=[
+            StringComparison("first_name", algorithm="jaro_winkler"),
+            StringComparison("last_name", algorithm="jaro_winkler"),
+        ]
+    )
     .filter(min_score=0.7)
     .decide(method="hungarian")
     .build()
@@ -93,7 +99,7 @@ result = orchestrator.run(
 
 ## Features
 
-- Type-safe with full mypy strict mode support
+- Fully type-annotated and checked with pyright (ships `py.typed`)
 - Extensible via protocols (custom comparisons, blockers, decision rules)
 - Native pandas DataFrames throughout
 - Crosswalk support for blocking key normalization

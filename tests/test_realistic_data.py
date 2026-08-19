@@ -16,10 +16,11 @@ import pandas as pd
 import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 from preclink import ExactComparison, Pipeline, StringComparison
 from preclink.preprocess.normalizer import CompletenessFilter
 from preclink.score.comparisons import TFIDFStringComparison
-from sklearn.feature_extraction.text import TfidfVectorizer
 
 # =============================================================================
 # 1. Ground-Truth Benchmark Tests (Febrl-style)
@@ -82,24 +83,28 @@ def generate_febrl_style_data(n_records: int, n_duplicates: int, seed: int = 42)
     streets = ["Main St", "Oak Ave", "Elm St", "Park Rd", "Cedar Ln", "Maple Dr"]
     cities = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"]
 
-    records = []
-    for i in range(n_records):
-        records.append(
-            {
-                "rec_id": f"rec-{i:04d}",
-                "first_name": rng.choice(first_names),
-                "last_name": rng.choice(last_names),
-                "dob": f"19{rng.randint(50, 99)}-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}",
-                "address": f"{rng.randint(1, 999)} {rng.choice(streets)}",
-                "city": rng.choice(cities),
-            }
-        )
+    records = [
+        {
+            "rec_id": f"rec-{i:04d}",
+            "first_name": rng.choice(first_names),
+            "last_name": rng.choice(last_names),
+            "dob": (
+                f"19{rng.randint(50, 99)}-"
+                f"{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}"
+            ),
+            "address": f"{rng.randint(1, 999)} {rng.choice(streets)}",
+            "city": rng.choice(cities),
+        }
+        for i in range(n_records)
+    ]
 
     df_a = pd.DataFrame(records)
 
     duplicates = []
     ground_truth = []
-    dup_indices = np_rng.choice(n_records, size=min(n_duplicates, n_records), replace=False)
+    dup_indices = np_rng.choice(
+        n_records, size=min(n_duplicates, n_records), replace=False
+    )
 
     for idx in dup_indices:
         orig = records[idx].copy()
@@ -118,7 +123,9 @@ def generate_febrl_style_data(n_records: int, n_duplicates: int, seed: int = 42)
             chars[p1], chars[p1 + 1] = chars[p1 + 1], chars[p1]
             dup["last_name"] = "".join(chars)
         elif mod_type == "abbrev":
-            dup["address"] = dup["address"].replace("Street", "St").replace("Avenue", "Ave")
+            dup["address"] = (
+                dup["address"].replace("Street", "St").replace("Avenue", "Ave")
+            )
         elif mod_type == "missing":
             dup["city"] = None
 
@@ -140,7 +147,9 @@ class TestGroundTruthBenchmark:
             Pipeline()
             .score(
                 [
-                    StringComparison("first_name", algorithm="jaro_winkler", weight=2.0),
+                    StringComparison(
+                        "first_name", algorithm="jaro_winkler", weight=2.0
+                    ),
                     StringComparison("last_name", algorithm="jaro_winkler", weight=2.0),
                     ExactComparison("dob", weight=1.5),
                 ]
@@ -152,7 +161,11 @@ class TestGroundTruthBenchmark:
 
         gt_pairs = {(a, b) for a, b in ground_truth}
         found_pairs = set(
-            zip(result.matches["rec_id_left"], result.matches["rec_id_right"], strict=True)
+            zip(
+                result.matches["rec_id_left"],
+                result.matches["rec_id_right"],
+                strict=True,
+            )
         )
 
         true_positives = len(gt_pairs & found_pairs)
@@ -167,7 +180,9 @@ class TestGroundTruthBenchmark:
             Pipeline()
             .score(
                 [
-                    StringComparison("first_name", algorithm="jaro_winkler", weight=1.0),
+                    StringComparison(
+                        "first_name", algorithm="jaro_winkler", weight=1.0
+                    ),
                     StringComparison("last_name", algorithm="jaro_winkler", weight=1.0),
                     ExactComparison("dob", weight=2.0),
                 ]
@@ -179,7 +194,11 @@ class TestGroundTruthBenchmark:
 
         gt_pairs = {(a, b) for a, b in ground_truth}
         found_pairs = set(
-            zip(result.matches["rec_id_left"], result.matches["rec_id_right"], strict=True)
+            zip(
+                result.matches["rec_id_left"],
+                result.matches["rec_id_right"],
+                strict=True,
+            )
         )
 
         true_positives = len(gt_pairs & found_pairs)
@@ -322,8 +341,12 @@ class TestTFIDFProperties:
         right_corpus = pd.Series(["John Smith"] * 100 + ["Xerxes Quigley"] * 1)
         comp.set_idf_weights(left_corpus, right_corpus)
 
-        common = comp.compare(pd.Series(["John Smith"]), pd.Series(["John Smith"])).iloc[0]
-        rare = comp.compare(pd.Series(["Xerxes Quigley"]), pd.Series(["Xerxes Quigley"])).iloc[0]
+        common = comp.compare(
+            pd.Series(["John Smith"]), pd.Series(["John Smith"])
+        ).iloc[0]
+        rare = comp.compare(
+            pd.Series(["Xerxes Quigley"]), pd.Series(["Xerxes Quigley"])
+        ).iloc[0]
 
         assert rare > common, f"Rare ({rare:.3f}) should > common ({common:.3f})"
 
@@ -349,7 +372,9 @@ class TestTFIDFProperties:
 
     @given(
         st.lists(
-            st.text(min_size=1, max_size=10, alphabet=string.ascii_letters), min_size=2, max_size=20
+            st.text(min_size=1, max_size=10, alphabet=string.ascii_letters),
+            min_size=2,
+            max_size=20,
         )
     )
     @settings(max_examples=30)
@@ -375,7 +400,7 @@ class TestRealWorldPatterns:
     """Tests with realistic name/address variations."""
 
     @pytest.mark.parametrize(
-        "full,nick,min_score",
+        ("full", "nick", "min_score"),
         [
             ("Robert", "Bob", 0.3),
             ("William", "Bill", 0.3),
@@ -396,7 +421,7 @@ class TestRealWorldPatterns:
         assert score > min_score, f"'{full}' vs '{nick}' should score > {min_score}"
 
     @pytest.mark.parametrize(
-        "addr1,addr2,min_score",
+        ("addr1", "addr2", "min_score"),
         [
             ("123 Main Street", "123 Main St", 0.8),
             ("456 Oak Avenue", "456 Oak Ave", 0.8),
@@ -416,7 +441,7 @@ class TestRealWorldPatterns:
         assert score > min_score, f"'{addr1}' vs '{addr2}' should score > {min_score}"
 
     @pytest.mark.parametrize(
-        "name1,name2",
+        ("name1", "name2"),
         [
             ("IBM", "International Business Machines"),
             ("AT&T", "American Telephone Telegraph"),
@@ -439,7 +464,7 @@ class TestRealWorldPatterns:
         assert all(score > 0.8 for score in scores)
 
     def test_case_sensitivity_jaro_winkler(self):
-        """Jaro-Winkler is case-sensitive - matching requires same case or preprocessing."""
+        """Jaro-Winkler is case-sensitive: matching needs same case or preprocessing."""
         comp = StringComparison("name", algorithm="jaro_winkler")
         left = pd.Series(["JOHN", "alice"])
         right = pd.Series(["john", "ALICE"])
@@ -468,11 +493,15 @@ class TestSklearnRegression:
         idf_common = comp._idf_weights.get("common", 0)
         idf_rare = comp._idf_weights.get("rare", 0)
 
-        assert idf_rare > idf_common, f"Rare IDF ({idf_rare}) should > common ({idf_common})"
+        assert idf_rare > idf_common, (
+            f"Rare IDF ({idf_rare}) should > common ({idf_common})"
+        )
 
     def test_idf_increases_with_rarity(self):
         """IDF should increase as term frequency decreases."""
-        corpus = ["very_common"] * 100 + ["common"] * 50 + ["uncommon"] * 10 + ["rare"] * 2
+        corpus = (
+            ["very_common"] * 100 + ["common"] * 50 + ["uncommon"] * 10 + ["rare"] * 2
+        )
 
         comp = TFIDFStringComparison("name")
         series = pd.Series(corpus)
@@ -491,8 +520,12 @@ class TestSklearnRegression:
 
         vectorizer = TfidfVectorizer(use_idf=True, smooth_idf=False)
         vectorizer.fit(corpus)
-        sklearn_idf = dict(zip(vectorizer.get_feature_names_out(), vectorizer.idf_, strict=True))
-        sklearn_order = sorted(sklearn_idf.keys(), key=lambda x: sklearn_idf[x], reverse=True)
+        sklearn_idf = dict(
+            zip(vectorizer.get_feature_names_out(), vectorizer.idf_, strict=True)
+        )
+        sklearn_order = sorted(
+            sklearn_idf.keys(), key=lambda x: sklearn_idf[x], reverse=True
+        )
 
         comp = TFIDFStringComparison("name")
         series = pd.Series(corpus)
@@ -604,7 +637,9 @@ class TestEndToEndPipeline:
             .preprocess(lowercase=True)
             .score(
                 [
-                    StringComparison("first_name", algorithm="jaro_winkler", weight=1.5),
+                    StringComparison(
+                        "first_name", algorithm="jaro_winkler", weight=1.5
+                    ),
                     StringComparison("last_name", algorithm="jaro_winkler", weight=1.5),
                     ExactComparison("dob", weight=1.0),
                 ]
@@ -621,13 +656,25 @@ class TestEndToEndPipeline:
         left = pd.DataFrame(
             {
                 "id": range(1, 6),
-                "name": ["John Smith", "John Smith", "John Smith", "Xerxes Quigley", "Jane Doe"],
+                "name": [
+                    "John Smith",
+                    "John Smith",
+                    "John Smith",
+                    "Xerxes Quigley",
+                    "Jane Doe",
+                ],
             }
         )
         right = pd.DataFrame(
             {
                 "id": range(101, 106),
-                "name": ["John Smith", "John Smith", "John Smith", "Xerxes Quigley", "Jane Doe"],
+                "name": [
+                    "John Smith",
+                    "John Smith",
+                    "John Smith",
+                    "Xerxes Quigley",
+                    "Jane Doe",
+                ],
             }
         )
 

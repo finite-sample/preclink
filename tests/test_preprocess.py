@@ -2,6 +2,7 @@
 
 import pandas as pd
 import pytest
+
 from preclink.preprocess.normalizer import (
     CompletenessFilter,
     CompletenessReport,
@@ -45,8 +46,10 @@ class TestCompletenessFilter:
                 "optional": [None, None, None],
             }
         )
-        filt = CompletenessFilter(min_completeness=1.0, required_columns=["name", "city"])
-        filtered, report = filt.filter(df)
+        filt = CompletenessFilter(
+            min_completeness=1.0, required_columns=["name", "city"]
+        )
+        filtered, _report = filt.filter(df)
         assert len(filtered) == 2
         assert "Alice" not in filtered["name"].values
 
@@ -86,7 +89,7 @@ class TestCompletenessFilter:
             }
         )
         filt = CompletenessFilter(min_completeness=1.0)
-        filtered, report = filt.filter(df)
+        filtered, _report = filt.filter(df)
         assert len(filtered) == 1
         assert filtered.iloc[0]["name"] == "Alice"
 
@@ -107,7 +110,7 @@ class TestCompletenessFilter:
 
 class TestTextNormalizer:
     def test_normalize_unicode(self):
-        df = pd.DataFrame({"name": ["caf\u00e9", "na\u00efve"]})
+        df = pd.DataFrame({"name": ["café", "naïve"]})
         normalizer = TextNormalizer(normalize_unicode=True)
         result = normalizer.preprocess(df)
         assert result["name"].iloc[0] == "café"

@@ -16,7 +16,12 @@ import pandas as pd
 
 try:
     import recordlinkage
-    from recordlinkage.datasets import load_febrl1, load_febrl2, load_febrl3, load_febrl4
+    from recordlinkage.datasets import (
+        load_febrl1,
+        load_febrl2,
+        load_febrl3,
+        load_febrl4,
+    )
 
     HAS_RECORDLINKAGE = True
 except ImportError:
@@ -51,7 +56,11 @@ def compute_metrics(
     true_positives = len(predicted & ground_truth)
     precision = true_positives / len(predicted) if predicted else 0.0
     recall = true_positives / len(ground_truth) if ground_truth else 0.0
-    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
+    f1 = (
+        2 * precision * recall / (precision + recall)
+        if (precision + recall) > 0
+        else 0.0
+    )
 
     return precision, recall, f1
 
@@ -313,15 +322,15 @@ def main() -> None:
     ]
 
     # febrl4 is a two-table linkage dataset (not deduplication)
-    dfA, dfB = load_febrl4()
+    df_a, df_b = load_febrl4()
     # Ground truth: rec-XXX-org in A matches rec-XXX-dup-N in B
     febrl4_truth: set[tuple[str, str]] = set()
-    for idx_b in dfB.index:
+    for idx_b in df_b.index:
         base = str(idx_b).split("-dup")[0]
         idx_a = base + "-org"
-        if idx_a in dfA.index:
+        if idx_a in df_a.index:
             febrl4_truth.add((idx_a, str(idx_b)))
-    datasets.append(("febrl4", (dfA, dfB, febrl4_truth)))
+    datasets.append(("febrl4", (df_a, df_b, febrl4_truth)))
 
     results: list[BenchmarkResult] = []
 
@@ -330,20 +339,30 @@ def main() -> None:
             df_orig, df_dup, ground_truth = data
         else:
             df_orig, df_dup, ground_truth = split_febrl_data(data)
-        print(f"\n{name}: {len(df_orig)} originals, {len(df_dup)} duplicates, {len(ground_truth)} pairs")
+        print(
+            f"\n{name}: {len(df_orig)} originals, "
+            f"{len(df_dup)} duplicates, {len(ground_truth)} pairs"
+        )
 
         r = benchmark_preclink(df_orig, df_dup, ground_truth, name)
         results.append(r)
-        print(f"  preclink:           P={r.precision:.1%} R={r.recall:.1%} F1={r.f1:.1%}")
+        print(
+            f"  preclink:           P={r.precision:.1%} R={r.recall:.1%} F1={r.f1:.1%}"
+        )
 
         r = benchmark_preclink_multipass(df_orig, df_dup, ground_truth, name)
         results.append(r)
-        print(f"  preclink-multipass: P={r.precision:.1%} R={r.recall:.1%} F1={r.f1:.1%}")
+        print(
+            f"  preclink-multipass: P={r.precision:.1%} R={r.recall:.1%} F1={r.f1:.1%}"
+        )
 
         r = benchmark_recordlinkage(df_orig, df_dup, ground_truth, name)
         if r:
             results.append(r)
-            print(f"  recordlinkage:      P={r.precision:.1%} R={r.recall:.1%} F1={r.f1:.1%}")
+            print(
+                f"  recordlinkage:      P={r.precision:.1%} "
+                f"R={r.recall:.1%} F1={r.f1:.1%}"
+            )
 
     print_results(results)
     print_summary(results)

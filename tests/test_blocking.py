@@ -1,6 +1,7 @@
 """Tests for blocking operations."""
 
 import pandas as pd
+
 from preclink.block.blocker import FieldBlocker, FullBlocker
 from preclink.block.crosswalk import Crosswalk
 
