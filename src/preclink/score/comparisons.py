@@ -13,6 +13,29 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 
+def _similarity_func(algorithm: StringAlgorithm) -> "Callable[[Any, Any], float]":
+    if algorithm == "jaro_winkler":
+        return rf_distance.JaroWinkler.normalized_similarity
+    if algorithm == "levenshtein":
+        return rf_distance.Levenshtein.normalized_similarity
+    if algorithm == "damerau_levenshtein":
+        return rf_distance.DamerauLevenshtein.normalized_similarity
+    msg = f"Unknown algorithm: {algorithm}"
+    raise ValueError(msg)
+
+
+def _score_pairs(
+    left: pd.Series, right: pd.Series, score: "Callable[[str, str], float]"
+) -> pd.Series:
+    scores = []
+    for l_val, r_val in zip(left, right, strict=True):
+        if pd.isna(l_val) or pd.isna(r_val):
+            scores.append(0.0)
+        else:
+            scores.append(score(str(l_val), str(r_val)))
+    return pd.Series(scores, index=left.index)
+
+
 @dataclass(frozen=True, slots=True)
 class StringComparison:
     """String similarity comparison using fuzzy matching algorithms.
@@ -37,25 +60,7 @@ class StringComparison:
         Returns:
             Series of similarity scores between 0 and 1.
         """
-        func: Callable[[Any, Any], float]
-        if self.algorithm == "jaro_winkler":
-            func = rf_distance.JaroWinkler.normalized_similarity
-        elif self.algorithm == "levenshtein":
-            func = rf_distance.Levenshtein.normalized_similarity
-        elif self.algorithm == "damerau_levenshtein":
-            func = rf_distance.DamerauLevenshtein.normalized_similarity
-        else:
-            msg = f"Unknown algorithm: {self.algorithm}"
-            raise ValueError(msg)
-
-        scores = []
-        for l_val, r_val in zip(left, right, strict=True):
-            if pd.isna(l_val) or pd.isna(r_val):
-                scores.append(0.0)
-            else:
-                scores.append(func(str(l_val), str(r_val)))
-
-        return pd.Series(scores, index=left.index)
+        return _score_pairs(left, right, _similarity_func(self.algorithm))
 
 
 @dataclass(frozen=True, slots=True)
@@ -245,27 +250,12 @@ class TFIDFStringComparison:
         Returns:
             Series of TF-IDF weighted similarity scores between 0 and 1.
         """
-        func: Callable[[Any, Any], float]
-        if self.algorithm == "jaro_winkler":
-            func = rf_distance.JaroWinkler.normalized_similarity
-        elif self.algorithm == "levenshtein":
-            func = rf_distance.Levenshtein.normalized_similarity
-        elif self.algorithm == "damerau_levenshtein":
-            func = rf_distance.DamerauLevenshtein.normalized_similarity
-        else:
-            msg = f"Unknown algorithm: {self.algorithm}"
-            raise ValueError(msg)
+        func = _similarity_func(self.algorithm)
 
-        scores = []
-        for l_val, r_val in zip(left, right, strict=True):
-            if pd.isna(l_val) or pd.isna(r_val):
-                scores.append(0.0)
-            else:
-                l_str, r_str = str(l_val), str(r_val)
-                base_score = func(l_str, r_str)
-                idf_left = self._get_idf_weight(l_str)
-                idf_right = self._get_idf_weight(r_str)
-                idf_weight = (idf_left + idf_right) / 2
-                scores.append(base_score * idf_weight)
+        def idf_weighted(l_str: str, r_str: str) -> float:
+            idf_left = self._get_idf_weight(l_str)
+            idf_right = self._get_idf_weight(r_str)
+            idf_weight = (idf_left + idf_right) / 2
+            return func(l_str, r_str) * idf_weight
 
-        return pd.Series(scores, index=left.index)
+        return _score_pairs(left, right, idf_weighted)
