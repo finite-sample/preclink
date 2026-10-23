@@ -1,7 +1,10 @@
 """Tests for comparison operations."""
 
+import math
+
 import pandas as pd
 import pytest
+from rapidfuzz import distance as rf_distance
 
 from preclink.score.comparisons import (
     DateComparison,
@@ -244,3 +247,67 @@ class TestTFIDFStringComparison:
 
         assert comp._max_idf == 1.0
         assert comp._get_idf_weight("anything") == 1.0
+
+
+RAPIDFUZZ_SIMILARITY = {
+    "jaro_winkler": rf_distance.JaroWinkler.normalized_similarity,
+    "levenshtein": rf_distance.Levenshtein.normalized_similarity,
+    "damerau_levenshtein": rf_distance.DamerauLevenshtein.normalized_similarity,
+}
+PAIR_LEFT = pd.Series(
+    ["Jonathan", None, "Mary", 12, "Smith"], index=[10, 20, 30, 40, 50]
+)
+PAIR_RIGHT = pd.Series(["Jonathon", "Ann", None, "12", "Smyth"], index=[1, 2, 3, 4, 5])
+
+
+@pytest.mark.parametrize("algorithm", list(RAPIDFUZZ_SIMILARITY))
+class TestStringScoresMatchRapidfuzz:
+    def test_string_comparison(self, algorithm):
+        sim = RAPIDFUZZ_SIMILARITY[algorithm]
+        scores = StringComparison("name", algorithm=algorithm).compare(
+            PAIR_LEFT, PAIR_RIGHT
+        )
+        assert list(scores.index) == [10, 20, 30, 40, 50]
+        assert list(scores) == [
+            sim("Jonathan", "Jonathon"),
+            0.0,
+            0.0,
+            1.0,
+            sim("Smith", "Smyth"),
+        ]
+
+    def test_tfidf_comparison(self, algorithm):
+        sim = RAPIDFUZZ_SIMILARITY[algorithm]
+        comp = TFIDFStringComparison("name", algorithm=algorithm)
+        corpus = pd.Series(["Jonathan", "Jonathan", "Jonathon", "Smith", "Smyth"])
+        comp.set_idf_weights(corpus, pd.Series(["12", "Smith"]))
+
+        n = 7
+        counts = {"Jonathan": 2, "Jonathon": 1, "Smith": 2, "Smyth": 1, "12": 1}
+        max_idf = math.log(n / 1)
+
+        def weight(value):
+            return math.log(n / counts[value]) / max_idf
+
+        def expected(l_str, r_str):
+            return sim(l_str, r_str) * ((weight(l_str) + weight(r_str)) / 2)
+
+        scores = comp.compare(PAIR_LEFT, PAIR_RIGHT)
+        assert list(scores.index) == [10, 20, 30, 40, 50]
+        assert list(scores) == pytest.approx(
+            [
+                expected("Jonathan", "Jonathon"),
+                0.0,
+                0.0,
+                expected("12", "12"),
+                expected("Smith", "Smyth"),
+            ],
+            rel=1e-12,
+        )
+
+
+@pytest.mark.parametrize("comparison_cls", [StringComparison, TFIDFStringComparison])
+def test_unknown_algorithm_raises(comparison_cls):
+    comp = comparison_cls("name", algorithm="soundex")
+    with pytest.raises(ValueError, match="Unknown algorithm: soundex"):
+        comp.compare(pd.Series(["a"]), pd.Series(["a"]))
