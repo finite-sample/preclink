@@ -1,4 +1,4 @@
-# preclink
+# preclink: record linkage with precision first
 
 [![PyPI version](https://badge.fury.io/py/preclink.svg)](https://badge.fury.io/py/preclink)
 [![Downloads](https://pepy.tech/badge/preclink)](https://pepy.tech/project/preclink)
