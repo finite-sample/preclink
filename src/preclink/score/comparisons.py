@@ -129,7 +129,7 @@ class NumericComparison:
             sigma = self.tolerance / 2.0
             scores = np.exp(-0.5 * (diff / sigma) ** 2)
 
-        scores_masked = scores.where(both_valid, 0.0)
+        scores_masked = as_series(scores).where(both_valid, 0.0)
         result: pd.Series = pd.Series(list(scores_masked), index=left.index)
         return result
 
