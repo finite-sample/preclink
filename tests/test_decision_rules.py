@@ -1,5 +1,6 @@
 """Tests for decision rule algorithms."""
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -159,6 +160,26 @@ class TestRowSequentialDecision:
         expected = [first]
         if not pairs["right_index"].isin([first["right_index"]]).iloc[1]:
             expected.append(pairs.iloc[1])
+        pd.testing.assert_frame_equal(
+            RowSequentialDecision().decide(pairs), pd.DataFrame(expected)
+        )
+
+    def test_missing_target_on_large_numeric_table(self):
+        # pandas can use different membership algorithms on the whole column and
+        # a small group. The original decision rule compared the whole column.
+        n = 1_000_001
+        pairs = pd.DataFrame(
+            {
+                "left_index": np.zeros(n, dtype=int),
+                "right_index": np.zeros(n),
+                "score": np.zeros(n),
+            }
+        )
+        pairs.loc[0, ["right_index", "score"]] = [float("nan"), 1]
+        pairs.loc[n - 1, ["left_index", "right_index"]] = [1, float("nan")]
+        expected = [pairs.iloc[0]]
+        if not pairs["right_index"].isin([expected[0]["right_index"]]).iat[-1]:
+            expected.append(pairs.iloc[-1])
         pd.testing.assert_frame_equal(
             RowSequentialDecision().decide(pairs), pd.DataFrame(expected)
         )
