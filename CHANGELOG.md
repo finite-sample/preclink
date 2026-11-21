@@ -9,8 +9,12 @@ that version.
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-11-21
+
 ### Changed
 
+- Row-sequential matching groups candidate pairs by source record once. Each
+  source still gets its highest-scoring available target in the same order.
 - Adopted the py-canon fleet standard: `uv_build` backend with an explicit
   version, `src/` layout, reusable CI/docs/release workflows, ruff-only
   linting and pyright in place of mypy.
@@ -21,5 +25,6 @@ Releases up to and including 1.2.0 predate this changelog; see the
 [commit history](https://github.com/finite-sample/preclink/commits/main) for
 what changed.
 
-[Unreleased]: https://github.com/finite-sample/preclink/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/finite-sample/preclink/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/finite-sample/preclink/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/finite-sample/preclink/releases/tag/v1.2.0

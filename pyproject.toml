@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "preclink"
-version = "1.2.0"
+version = "1.2.1"
 description = "High-precision record linkage library with multi-pass support"
 readme = "README.md"
 license = "MIT"
