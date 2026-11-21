@@ -27,7 +27,7 @@ try:
 except ImportError:
     HAS_RECORDLINKAGE = False
 
-from preclink import ExactComparison, Pipeline, StringComparison
+from preclink import ExactComparison, Pipeline, PipelineExecutor, StringComparison
 from preclink.multipass import MultiPassOrchestrator, PassConfig
 
 
@@ -82,20 +82,9 @@ def split_febrl_data(
     return df_orig, df_dup, ground_truth
 
 
-def benchmark_preclink(
-    df_orig: pd.DataFrame,
-    df_dup: pd.DataFrame,
-    ground_truth: set[tuple[str, str]],
-    dataset_name: str,
-    threshold: float = 0.70,
-) -> BenchmarkResult:
-    """Benchmark preclink with standard pipeline."""
-    df_orig = df_orig.copy()
-    df_dup = df_dup.copy()
-    df_orig["_id"] = df_orig.index.astype(str)
-    df_dup["_id"] = df_dup.index.astype(str)
-
-    pipeline = (
+def standard_pipeline(threshold: float = 0.70) -> PipelineExecutor:
+    """Build the postcode-blocked, single-pass benchmark pipeline."""
+    return (
         Pipeline()
         .preprocess(lowercase=True, strip_whitespace=True)
         .block("postcode")
@@ -112,6 +101,22 @@ def benchmark_preclink(
         .decide(method="hungarian")
         .build()
     )
+
+
+def benchmark_preclink(
+    df_orig: pd.DataFrame,
+    df_dup: pd.DataFrame,
+    ground_truth: set[tuple[str, str]],
+    dataset_name: str,
+    threshold: float = 0.70,
+) -> BenchmarkResult:
+    """Benchmark preclink with standard pipeline."""
+    df_orig = df_orig.copy()
+    df_dup = df_dup.copy()
+    df_orig["_id"] = df_orig.index.astype(str)
+    df_dup["_id"] = df_dup.index.astype(str)
+
+    pipeline = standard_pipeline(threshold)
 
     start = time.perf_counter()
     result = pipeline.link(df_orig, df_dup)
