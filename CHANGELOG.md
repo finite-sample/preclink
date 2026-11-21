@@ -7,9 +7,9 @@ Set the release version with `uv version X.Y.Z`, record the release here, and
 tag the merged commit `vX.Y.Z`. Pushing the matching tag builds and publishes
 that version.
 
-## [Unreleased]
+## Unreleased
 
-## [1.2.1] - 2026-11-21
+## 1.2.1 - 2026-11-21
 
 ### Changed
 
@@ -25,6 +25,4 @@ Releases up to and including 1.2.0 predate this changelog; see the
 [commit history](https://github.com/finite-sample/preclink/commits/main) for
 what changed.
 
-[Unreleased]: https://github.com/finite-sample/preclink/compare/v1.2.1...HEAD
-[1.2.1]: https://github.com/finite-sample/preclink/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/finite-sample/preclink/releases/tag/v1.2.0
