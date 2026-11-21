@@ -23,7 +23,7 @@ docs:
 ci: lint typecheck doccheck test docs
 
 ci-docker:
-	docker run --rm -v $(PWD):/app -w /app python:3.12-slim sh -c "\
+	docker run --rm -e UV_PROJECT_ENVIRONMENT=/tmp/preclink-venv -v $(PWD):/app -w /app python:3.12 sh -c "\
 		pip install uv && \
 		uv sync --all-groups && \
 		make ci"
