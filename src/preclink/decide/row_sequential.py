@@ -24,16 +24,21 @@ class RowSequentialDecision:
         if scored_pairs.empty:
             return scored_pairs
 
-        left_indices = sorted(column(scored_pairs, "left_index").unique())
+        left_ids = column(scored_pairs, "left_index")
+        left_indices = sorted(left_ids.unique())
+        positions = scored_pairs.groupby(left_ids, sort=False, observed=True).indices
 
         matched_right: set[object] = set()
         matches = []
 
         for left_idx in left_indices:
+            group_positions = positions.get(left_idx)
+            if group_positions is None:
+                # Missing identifiers never pass the equality test for a left ID.
+                continue
+            group = scored_pairs.iloc[group_positions]
             candidates = rows(
-                scored_pairs,
-                (column(scored_pairs, "left_index") == left_idx)
-                & (~column(scored_pairs, "right_index").isin(list(matched_right))),
+                group, ~column(group, "right_index").isin(list(matched_right))
             )
 
             if not candidates.empty:
