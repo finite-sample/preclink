@@ -20,7 +20,7 @@ jobs:
     with:
       # requires-python floors at 3.12, so the reusable default 3.11 leg
       # cannot resolve.
-      python-versions: '["3.12", "3.14"]'
+      python-versions: '["3.13", "3.14"]'
       wheel-import: preclink
       coverage-floor: 88
       run-preen: true
