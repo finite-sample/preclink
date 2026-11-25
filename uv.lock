@@ -852,10 +852,10 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "numpy", specifier = ">=1.26.0" },
-    { name = "pandas", specifier = ">=2.0.0" },
-    { name = "rapidfuzz", specifier = ">=3.0.0" },
-    { name = "scipy", specifier = ">=1.11.0" },
+    { name = "numpy", specifier = ">=2.1.0" },
+    { name = "pandas", specifier = ">=2.2.3" },
+    { name = "rapidfuzz", specifier = ">=3.9.6" },
+    { name = "scipy", specifier = ">=1.14.1" },
 ]
 
 [package.metadata.requires-dev]
