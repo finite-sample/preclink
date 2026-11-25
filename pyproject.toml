@@ -29,10 +29,10 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "pandas>=2.0.0",
-    "rapidfuzz>=3.0.0",
-    "scipy>=1.11.0",
-    "numpy>=1.26.0",
+    "pandas>=2.2.3",
+    "rapidfuzz>=3.9.6",
+    "scipy>=1.14.1",
+    "numpy>=2.1.0",
 ]
 
 [project.urls]
